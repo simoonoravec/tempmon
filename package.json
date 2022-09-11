@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "bme280-sensor": "^0.1.7",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
+    "node-schedule": "^2.1.0",
+    "ws": "^8.5.0"
+  }
+}
