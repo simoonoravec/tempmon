@@ -234,3 +234,10 @@ function round(num) {
 function unixTime() {
   return Math.floor(new Date() / 1000);
 }
+
+/**
+ * Shutdown hook
+ */
+process.on('SIGINT', () => {
+  db.close();
+});
