@@ -50,7 +50,7 @@ function getLongtermData(range) {
   let x = unixTime() - (range * 3600);
 
   return new Promise((resolve) => {
-    db.all(`SELECT * FROM data WHERE time > ${x}`, (err, rows) => {
+    db.all(`SELECT * FROM data WHERE time > ${x} ORDER BY time ASC`, (err, rows) => {
       if (err) {
         resolve(null);
       }
