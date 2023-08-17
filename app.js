@@ -72,7 +72,7 @@ function logData() {
       return;
     }
 
-    let time =  unixTime();
+    let time = unixTime();
     let temp = round(data.temperature_C);
     let humidity = round(data.humidity);
     let pressure = round(data.pressure_hPa);
@@ -111,7 +111,7 @@ bme280.init()
           });
         }
       }, 2000);
-    }, 1000 - new Date().getMilliseconds());
+    }, 1000);
   })
   .catch((err) => console.error(`BME280 initialization failed: ${err} `));
 
