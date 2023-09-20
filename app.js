@@ -25,6 +25,7 @@ const bme280 = new BME280({
   i2cAddress: 0x76,
 });
 
+let http_server = null;
 let wss = null;
 
 /**
@@ -119,7 +120,7 @@ bme280.init()
  * Initialize HTTP API server
  */
 function initHttp() {
-  const server = http.createServer(async (req, res) => {
+  http_server = http.createServer(async (req, res) => {
     let parsed_url = url.parse(req.url, true);
     let path = parsed_url.pathname;
     let params = parsed_url.query;
@@ -197,7 +198,7 @@ function initHttp() {
     return;
   });
 
-  server.listen(65069, "127.0.0.1", () => {
+  http_server.listen(65069, "127.0.0.1", () => {
     console.log(`HTTP server running at 127.0.0.1:65069`);
   });
 }
@@ -239,5 +240,6 @@ function unixTime() {
  * Shutdown hook
  */
 process.on('SIGINT', () => {
+  http_server.close();
   db.close();
 });
