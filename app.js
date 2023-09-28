@@ -30,18 +30,48 @@ const db = new sqlite.Database('./data.db', (err) => {
 });
 
 /**
+ * Initialize global variables
+ */
+let wss = null;
+let http_server = null;
+
+/**
  * Initialize the BME280 sensor (at it's default address)
  */
 const bme280 = new BME280({
   i2cBusNo: 1,
   i2cAddress: 0x76,
 });
+bme280.init()
+  .then(() => {
+    console.log("BME280 initialization succeeded");
+    cron.scheduleJob("*/5 * * * *", function () {
+      logData();
+    });
+    initHttp();
+    initWS();
 
-/**
- * Initialize other global variables
- */
-let wss = null;
-let http_server = null;
+    setTimeout(() => {
+      setInterval(() => {
+        if (wss != null) {
+          readSensorData(function (data) {
+            if (data != null) {
+              var data_out = {
+                time: unixTime(),
+                temp: round(data.temperature_C),
+                humidity: round(data.humidity),
+                pressure: round(data.pressure_hPa),
+              };
+              wss.clients.forEach((cl) => {
+                cl.send(JSON.stringify(data_out));
+              });
+            }
+          });
+        }
+      }, 2000);
+    }, 1000);
+  })
+  .catch((err) => console.error(`BME280 initialization failed: ${err} `));
 
 /**
  * Read the current data from the sensor
@@ -164,40 +194,6 @@ function logData() {
     db.run("INSERT INTO data (time, temp, humidity, pressure) VALUES (?, ?, ?, ?)", [time, temp, humidity, pressure]);
   });
 }
-
-/**
- * Initialize BME280 sensor
- */
-bme280.init()
-  .then(() => {
-    console.log("BME280 initialization succeeded");
-    cron.scheduleJob("*/5 * * * *", function () {
-      logData();
-    });
-    initHttp();
-    initWS();
-
-    setTimeout(() => {
-      setInterval(() => {
-        if (wss != null) {
-          readSensorData(function (data) {
-            if (data != null) {
-              var data_out = {
-                time: unixTime(),
-                temp: round(data.temperature_C),
-                humidity: round(data.humidity),
-                pressure: round(data.pressure_hPa),
-              };
-              wss.clients.forEach((cl) => {
-                cl.send(JSON.stringify(data_out));
-              });
-            }
-          });
-        }
-      }, 2000);
-    }, 1000);
-  })
-  .catch((err) => console.error(`BME280 initialization failed: ${err} `));
 
 /**
  * Initialize HTTP API server
