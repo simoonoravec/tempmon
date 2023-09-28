@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/assets/svg/tempmon.svg">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/jquery.modal.min.css">
+    <link rel="stylesheet" href="/assets/css/tooltip.css">
+    <title>Tempmon</title>
+</head>
+<body>
+<noscript>
+    <div class="splash">
+        <img id="splash-logo" style="width:15rem;" src="/assets/svg/sad.svg">
+        <h2>Táto stránka vyžaduje na fungovanie povolený JavaScript</h2>
+    </div>
+</noscript>
+<div class="splash" id="splash" style="display:none;">
+    <img id="splash-logo" class="pulse" src="/assets/svg/tempmon.svg">
+</div>
+<div id="page" style="display:none;">
+    <h1>TEMPMON</h1>
+    <div id="container">
+        <div class="row" style="text-align:center;">
+            <div class="column">
+                <h3>Teplota</h3>
+                <div class="gauge-container" id="temp_now"></div>
+            </div>
+            <div class="column">
+                <h3>Vlhkosť</h3>
+                <div class="gauge-container" id="humidity_now"></div>
+            </div>
+            <div class="column">
+                <h3>Tlak</h3>
+                <div class="gauge-container" id="pressure_now"></div>
+            </div>
+        </div>
+
+        <div style="text-align:center;margin-bottom:10px;">
+            Rozsah grafov: <select id="range">
+                <option value="48">48 hodín</option>
+                <option value="24" selected="selected">24 hodín</option>
+                <option value="12">12 hodín</option>
+                <option value="8">8 hodín</option>
+                <option value="2">2 hodiny</option>
+                <option value="1">1 hodina</option>
+            </select>
+        </div>
+
+        <div class="row">
+            <div class="column">
+                <canvas id="temp"></canvas>
+            </div>
+            <div class="column">
+                <canvas id="humidity"></canvas>
+            </div>
+            <div class="column">
+                <canvas id="pressure"></canvas>
+            </div>
+        </div>
+
+        <div style="text-align:center;margin-top:2rem;">
+            <h3>Aktuálne dáta</h3>
+            <table align="center" class="t1">
+                <tr>
+                    <td></td>
+                    <td>Izba</td>
+                    <td><span style="border-bottom: 1px dashed #999;" class="tooltip-right" data-tooltip="Dáta získané cez OpenWeatherMap, aktualizácia raz za 10 minút">Vonku</span></td>
+                </tr>
+                <tr>
+                    <th class="ta-right">Teplota</th>
+                    <td class="ta-center"><span id="rtd_temp">0</span> &deg;C</td>
+                    <td class="ta-center"><span id="owm_temp">0</span> &deg;C</td>
+                </tr>
+                <tr>
+                    <th class="ta-right">Pocitová teplota</th>
+                    <td class="ta-center"><span id="rtd_heatindex">0</span> &deg;C</td>
+                    <td class="ta-center"><span id="owm_heatindex">0</span> &deg;C</td>
+                </tr>
+                <tr>
+                    <th class="ta-right">Vlhkosť</th>
+                    <td class="ta-center"><span id="rtd_humidity">0</span> %</td>
+                    <td class="ta-center"><span id="owm_humidity">0</span> %</td>
+                </tr>
+                <tr>
+                    <th class="ta-right">Tlak</th>
+                    <td class="ta-center"><span id="rtd_pressure">0</span> hPa</td>
+                    <td class="ta-center"><span id="owm_pressure">0</span> hPa</td>
+                </tr>
+                <tr>
+                    <th class="ta-right">Oblačnosť</th>
+                    <td class="ta-center">N/A</td>
+                    <td class="ta-center"><span id="owm_cloudiness">0</span> %</td>
+                </tr>
+            </table>
+            <br>
+        </div>
+    </div>
+
+    <div id="modal_weather" class="modal modal-weather"><canvas id="modal_chart"></canvas></div>
+    <div id="modal_error" class="modal ta-center"><span style="color:#000;" id="modal_error_text"></span><br><button style="margin-top:1rem;" onclick="location.reload();">Obnoviť stránku</button></div>
+<div>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/chart.min.js"></script>
+<script src="/assets/js/jquery.modal.min.js"></script>
+<script src="/assets/js/gauge.min.js"></script>
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

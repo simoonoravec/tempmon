@@ -1,8 +1,11 @@
 const ws = require("ws");
 const BME280 = require("bme280-sensor");
 const cron = require("node-schedule");
-const http = require("http");
-const url = require("url");
+const express = require('express');
+const moment = require("moment");
+const fetch = require("node-fetch");
+
+const config = require('./config.json');
 
 const sqlite = require("sqlite3");
 const db = new sqlite.Database('./data.db', (err) => {
@@ -25,12 +28,12 @@ const bme280 = new BME280({
   i2cAddress: 0x76,
 });
 
-let http_server = null;
 let wss = null;
+let http_server = null;
 
 /**
  * Read the current data from the sensor
- * @param {*} callback 
+ * @param {*} callback
  */
 function readSensorData(callback) {
   bme280.readSensorData()
@@ -55,10 +58,78 @@ function getLongtermData(range) {
       if (err) {
         resolve(null);
       }
-  
-      resolve(rows);
+
+      let times = [];
+      let temp = [];
+      let humidity = [];
+      let pressure = [];
+
+      rows.forEach(row => {
+        times.push(moment.unix(row.time).format('H:mm'));
+        temp.push(row.temp);
+        humidity.push(row.humidity);
+        pressure.push(row.pressure);
+      });
+
+      resolve({
+        times,
+        temp,
+        humidity,
+        pressure
+      });
     });
   });
+}
+
+/* OpenWeatherMap Cache */
+let owm_cache = {
+  expires: 0,
+  data: null
+};
+
+/**
+ * Gets outdoor data from OpenWeatherMap
+ * @returns Array | null
+ */
+async function getOutdoorData() {
+  console.log(owm_cache.expires);
+  if (owm_cache.expires > unixTime()) {
+    let data = owm_cache.data;
+
+    data.cached = true;
+    data.next_update = owm_cache.expires - unixTime();
+
+    return data;
+  }
+
+  try {
+    let data = await fetch(`https://api.openweathermap.org/data/2.5/weather?appid=${config.owm_api_key}&lat=${config.own_location.lat}&lon=${config.own_location.lon}&units=metric`);
+    data = await data.json();
+
+    if (data.cod != 200) {
+      return null;
+    }
+
+    let out = {
+      time: moment.unix(data.dt).format('H:mm'),
+      temp: data.main.temp,
+      heat_index: data.main.feels_like,
+      humidity: data.main.humidity,
+      pressure: data.main.pressure,
+      cloudiness: data.clouds.all,
+      wind: data.wind.speed
+    };
+
+    owm_cache.expires = unixTime()+300;
+    owm_cache.data = out;
+
+    out.next_update = 300;
+    out.cached = false;
+
+    return out;
+  } catch (err) {
+    return null;
+  }
 }
 
 /**
@@ -120,87 +191,97 @@ bme280.init()
  * Initialize HTTP API server
  */
 function initHttp() {
-  http_server = http.createServer(async (req, res) => {
-    let parsed_url = url.parse(req.url, true);
-    let path = parsed_url.pathname;
-    let params = parsed_url.query;
+  const server = express();
 
-    if (path == "/status") {
-      res.setHeader("Content-Type", "text/plain");
-      readSensorData(function (data) {
-        if (data == null) {
-          res.statusCode = 500;
-          res.end("Sensor error");
-        } else {
-          res.statusCode = 200;
-          res.end("ok");
-        }
-      });
-      return;
-    }
+  server.use(express.static('./www'));
 
-    if (path == "/data/now") {
-      res.setHeader("Content-Type", "application/json");
-      readSensorData(function (data) {
-        if (data == null) {
-          res.statusCode = 500;
-          res.end(
-            JSON.stringify({
-              success: false,
-              error: "Could not read data from sensor.",
-              data: null,
-            })
-          );
-        } else {
-          res.statusCode = 200;
-          var data_out = {
-            success: true,
-            error: null,
-            data: {
-              time: unixTime(),
-              temp: round(data.temperature_C),
-              humidity: round(data.humidity),
-              pressure: round(data.pressure_hPa),
-            },
-          };
-          res.end(JSON.stringify(data_out));
-        }
-      });
-      return;
-    }
-
-    if (path == "/data/longterm") {
-      let range;
-      if (isNaN(params.range)) {
-        range = 24;
-      } else {
-        range = Math.round(parseInt(params.range));
-      }
-
-      res.setHeader("Content-Type", "application/json");
-      var data = await getLongtermData(range);
+  server.get('/api/data/now', (req, res) => {
+    readSensorData(function (data) {
       if (data == null) {
-        res.statusCode = 500;
-        res.end(
-          JSON.stringify({
-            success: false,
-            error: "Unable to read longterm monitoring data.",
-            data: null,
-          })
-        );
+        res.status(500);
+        res.json({
+          success: false,
+          error: "Could not read data from sensor.",
+          data: null,
+        });
       } else {
-        res.end(JSON.stringify({ success: true, error: null, data: data }));
+        res.json({
+          success: true,
+          error: null,
+          data: {
+            time: unixTime(),
+            temp: round(data.temperature_C),
+            humidity: round(data.humidity),
+            pressure: round(data.pressure_hPa),
+          },
+        });
       }
-      return;
-    }
-    res.statusCode = 400;
-    res.end();
-    return;
+    });
   });
 
-  http_server.listen(65069, "127.0.0.1", () => {
-    console.log(`HTTP server running at 127.0.0.1:65069`);
+  server.get('/api/data/longterm', async (req, res) => {
+    let range = req.query.range;
+    if (range == undefined || isNaN(range)) {
+      range = 24;
+    } else {
+      range = Math.round(parseInt(range));
+    }
+
+    res.setHeader("Content-Type", "application/json");
+    var data = await getLongtermData(range);
+    if (data == null) {
+      res.status(500);
+      res.json({
+        success: false,
+        error: "Unable to read longterm monitoring data.",
+        data: null,
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      error: null,
+      data: data 
+    });
   });
+
+  server.get('/api/data/outdoor', async (req, res) => {
+    let data = await getOutdoorData();
+
+    if (data == null) {
+      res.status(500);
+      res.json({
+        success: false,
+        error: "Unable to load data.",
+        data: null,
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      error: null,
+      data,
+    });
+  });
+
+  server.all('/api/*', (req, res) => {
+    res.status(404);
+    res.json({
+      success: false,
+      error: "API endpoint not found",
+      data: null
+    });
+  });
+
+  server.all('*', (req, res) => {
+    res.redirect('/');
+  });
+
+  http_server = server.listen(65069, () => {
+    console.log(`HTTP server listening on port 65069`);
+  })
 }
 
 /**
@@ -239,7 +320,10 @@ function unixTime() {
 /**
  * Shutdown hook
  */
-process.on('SIGINT', () => {
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
+
+function shutdown() {
   http_server.close();
   db.close();
-});
+}

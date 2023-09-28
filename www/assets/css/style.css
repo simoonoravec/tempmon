@@ -1,0 +1,166 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+html {
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+body {
+    background: #1b1c1f;
+    color: #fff;
+}
+
+h1 {
+    text-align: center;
+    color: #fff;
+}
+
+h2 {
+    font-size: 24px;
+    text-align: center;
+}
+
+h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+canvas {
+    background-color: #c7c7c7;
+    border-radius: 8px;
+}
+
+button {
+    display: block;
+    margin: auto;
+    font-size: 16px;
+    background-color: #007bff;
+    border: 1px solid #007bff;
+    color: #fff;
+    padding: .375rem .75rem;
+    border-radius: .25rem;
+    transition: color .15s;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+@media (max-width: 999px) {
+    .column {
+        width: 95% !important;
+        margin: auto;
+        margin-bottom: 20px;
+    }
+}
+@media (min-width: 1000px) {
+    .column {
+        float: left;
+        width: 33.33%;
+        padding: 10px;
+        height: 300px;
+    }
+
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+@media (max-width: 649px) {
+    .aladin {
+        width: 90%;
+        height: auto;
+    }
+}
+
+@media (min-width: 650px) {
+    .aladin {
+        width: 35rem;
+        height: auto;
+    }
+}
+
+.loading {
+    display: block;
+    margin: auto;
+    width: 128px;
+    height: auto;
+}
+
+.ta-left {
+    text-align: left !important;
+}
+
+.ta-right {
+    text-align: right !important;
+}
+
+.ta-center {
+    text-align: center !important;
+}
+
+.t1 {
+    border-collapse: collapse;
+}
+
+.t1 td, .t1 th {
+    border: 1px solid #3a3a3a;
+    padding: 8px;
+}
+
+.modal-weather {
+    max-width: unset !important;
+    width: 70% !important;
+    padding: 5px !important;
+    background-color: #e3e3e3 !important;
+}
+
+.splash {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+#splash-logo {
+    width: 20rem;
+    height: 20rem;
+}
+
+.pulse {
+    transform: scale(1);
+	animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+	0% {
+		transform: scale(0.95);
+	}
+
+	50% {
+		transform: scale(1);
+	}
+
+	100% {
+		transform: scale(0.95);
+	}
+}
+
+.gauge-container {
+    width: 20rem;
+    height: auto;
+    margin: auto;
+}

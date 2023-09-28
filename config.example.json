@@ -1,0 +1,7 @@
+{
+    "owm_api_key": "xxxxxx",
+    "own_location": {
+        "lat": "0",
+        "lon": "0" 
+    }
+}
