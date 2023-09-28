@@ -10,4 +10,5 @@ This app is currently NOT designed to use multiple sensors but I may add this fu
 I use [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/) and [Cloudflare Access](https://www.cloudflare.com/zero-trust/products/access/) to access it outside from my home network (It's FREE)
 
 #
-The example frontend is in SLOVAK language and I don't plan to translate it.
+The example frontend is in SLOVAK language and I don't plan to translate it.\
+It also probably won't work out of the box for you because I run it behind a proxy even at home.
