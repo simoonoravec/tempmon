@@ -7,7 +7,7 @@ This app is currently NOT designed to use multiple sensors but I may add this fu
 (When my lazy self sets up and outdoor sensor) For now it gets outdoor data [OpenWeatherMap API](https://openweathermap.org/api).
 
 **There is no built in security!**\
-I use [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/) and [Cloudflare Access](https://www.cloudflare.com/zero-trust/products/access/) to access it outside from my home network
+I use [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/) and [Cloudflare Access](https://www.cloudflare.com/zero-trust/products/access/) to access it outside from my home network (It's FREE)
 
 #
 The frontend is in SLOVAK language and I don't plan to translate it.
