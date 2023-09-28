@@ -1,13 +1,19 @@
-const ws = require("ws");
+const config = require('./config.json');
+
 const BME280 = require("bme280-sensor");
+
 const cron = require("node-schedule");
-const express = require('express');
 const moment = require("moment");
 const fetch = require("node-fetch");
 
-const config = require('./config.json');
+const ws = require("ws");
+const express = require('express');
 
 const sqlite = require("sqlite3");
+
+/**
+ * Initliaze the database
+ */
 const db = new sqlite.Database('./data.db', (err) => {
   if (err) {
     console.error(err.message);
@@ -23,11 +29,17 @@ const db = new sqlite.Database('./data.db', (err) => {
   );`);
 });
 
+/**
+ * Initialize the BME280 sensor (at it's default address)
+ */
 const bme280 = new BME280({
   i2cBusNo: 1,
   i2cAddress: 0x76,
 });
 
+/**
+ * Initialize other global variables
+ */
 let wss = null;
 let http_server = null;
 
