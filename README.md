@@ -11,4 +11,4 @@ I use [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/) and [Clou
 
 #
 The example frontend is in SLOVAK language and I don't plan to translate it.\
-It also probably won't work out of the box for you because I run it behind a proxy even at home.
+It also won't work out of the box for you because I run it behind a proxy even at home.
