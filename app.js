@@ -325,5 +325,5 @@ process.on('SIGINT', shutdown);
 
 function shutdown() {
   http_server.close();
-  db.close();
+  db.close(() => process.exit(0));
 }
