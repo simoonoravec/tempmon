@@ -74,128 +74,6 @@ bme280.init()
   .catch((err) => console.error(`BME280 initialization failed: ${err} `));
 
 /**
- * Read the current data from the sensor
- * @param {*} callback
- */
-function readSensorData(callback) {
-  bme280.readSensorData()
-    .then((data) => {
-      callback(data);
-    })
-    .catch((err) => {
-      console.log(`BME280 read error: ${err}`);
-      callback(null);
-    });
-}
-
-/**
- * Get the logged data from database from the last N hours
- * @returns Array
- */
-function getLongtermData(range) {
-  let x = unixTime() - (range * 3600);
-
-  return new Promise((resolve) => {
-    db.all(`SELECT * FROM data WHERE time > ${x} ORDER BY time ASC`, (err, rows) => {
-      if (err) {
-        resolve(null);
-      }
-
-      let times = [];
-      let temp = [];
-      let humidity = [];
-      let pressure = [];
-
-      rows.forEach(row => {
-        times.push(moment.unix(row.time).format('H:mm'));
-        temp.push(row.temp);
-        humidity.push(row.humidity);
-        pressure.push(row.pressure);
-      });
-
-      resolve({
-        times,
-        temp,
-        humidity,
-        pressure
-      });
-    });
-  });
-}
-
-/* OpenWeatherMap Cache */
-let owm_cache = {
-  expires: 0,
-  data: null
-};
-
-/**
- * Gets outdoor data from OpenWeatherMap
- * @returns Array | null
- */
-async function getOutdoorData() {
-  console.log(owm_cache.expires);
-  if (owm_cache.expires > unixTime()) {
-    let data = owm_cache.data;
-
-    data.cached = true;
-    data.next_update = owm_cache.expires - unixTime();
-
-    return data;
-  }
-
-  try {
-    let data = await fetch(`https://api.openweathermap.org/data/2.5/weather?appid=${config.owm_api_key}&lat=${config.own_location.lat}&lon=${config.own_location.lon}&units=metric`);
-    data = await data.json();
-
-    if (data.cod != 200) {
-      return null;
-    }
-
-    let out = {
-      time: moment.unix(data.dt).format('H:mm'),
-      temp: data.main.temp,
-      heat_index: data.main.feels_like,
-      humidity: data.main.humidity,
-      pressure: data.main.pressure,
-      cloudiness: data.clouds.all,
-      wind: data.wind.speed
-    };
-
-    owm_cache.expires = unixTime()+300;
-    owm_cache.data = out;
-
-    out.next_update = 300;
-    out.cached = false;
-
-    return out;
-  } catch (err) {
-    return null;
-  }
-}
-
-/**
- * Log sensor data to database
- */
-function logData() {
-  let t = unixTime() - 259200;
-  db.run("DELETE FROM data WHERE time < ?", [t]);
-
-  readSensorData(function (data) {
-    if (data == null) {
-      return;
-    }
-
-    let time = unixTime();
-    let temp = round(data.temperature_C);
-    let humidity = round(data.humidity);
-    let pressure = round(data.pressure_hPa);
-
-    db.run("INSERT INTO data (time, temp, humidity, pressure) VALUES (?, ?, ?, ?)", [time, temp, humidity, pressure]);
-  });
-}
-
-/**
  * Initialize HTTP API server
  */
 function initHttp() {
@@ -312,6 +190,127 @@ function initWS() {
   });
 
   console.log(`WebSocket server running at port 65070`);
+}
+
+/**
+ * Read the current data from the sensor
+ * @param {*} callback
+ */
+function readSensorData(callback) {
+  bme280.readSensorData()
+    .then((data) => {
+      callback(data);
+    })
+    .catch((err) => {
+      console.log(`BME280 read error: ${err}`);
+      callback(null);
+    });
+}
+
+/**
+ * Get the logged data from database from the last N hours
+ * @returns Array
+ */
+function getLongtermData(range) {
+  let x = unixTime() - (range * 3600);
+
+  return new Promise((resolve) => {
+    db.all(`SELECT * FROM data WHERE time > ${x} ORDER BY time ASC`, (err, rows) => {
+      if (err) {
+        resolve(null);
+      }
+
+      let times = [];
+      let temp = [];
+      let humidity = [];
+      let pressure = [];
+
+      rows.forEach(row => {
+        times.push(moment.unix(row.time).format('H:mm'));
+        temp.push(row.temp);
+        humidity.push(row.humidity);
+        pressure.push(row.pressure);
+      });
+
+      resolve({
+        times,
+        temp,
+        humidity,
+        pressure
+      });
+    });
+  });
+}
+
+/* OpenWeatherMap Cache */
+let owm_cache = {
+  expires: 0,
+  data: null
+};
+/**
+ * Gets outdoor data from OpenWeatherMap
+ * @returns Array | null
+ */
+async function getOutdoorData() {
+  console.log(owm_cache.expires);
+  if (owm_cache.expires > unixTime()) {
+    let data = owm_cache.data;
+
+    data.cached = true;
+    data.next_update = owm_cache.expires - unixTime();
+
+    return data;
+  }
+
+  try {
+    let data = await fetch(`https://api.openweathermap.org/data/2.5/weather?appid=${config.owm_api_key}&lat=${config.own_location.lat}&lon=${config.own_location.lon}&units=metric`);
+    data = await data.json();
+
+    if (data.cod != 200) {
+      return null;
+    }
+
+    let out = {
+      time: moment.unix(data.dt).format('H:mm'),
+      temp: data.main.temp,
+      heat_index: data.main.feels_like,
+      humidity: data.main.humidity,
+      pressure: data.main.pressure,
+      cloudiness: data.clouds.all,
+      wind: data.wind.speed
+    };
+
+    owm_cache.expires = unixTime()+300;
+    owm_cache.data = out;
+
+    out.next_update = 300;
+    out.cached = false;
+
+    return out;
+  } catch (err) {
+    return null;
+  }
+}
+
+/**
+ * Log sensor data to database
+ */
+function logData() {
+  let t = unixTime() - 259200;
+  db.run("DELETE FROM data WHERE time < ?", [t]);
+
+  readSensorData(function (data) {
+    if (data == null) {
+      return;
+    }
+
+    let time = unixTime();
+    let temp = round(data.temperature_C);
+    let humidity = round(data.humidity);
+    let pressure = round(data.pressure_hPa);
+
+    db.run("INSERT INTO data (time, temp, humidity, pressure) VALUES (?, ?, ?, ?)", [time, temp, humidity, pressure]);
+  });
 }
 
 /**
