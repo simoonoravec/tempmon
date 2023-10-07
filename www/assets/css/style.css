@@ -62,14 +62,19 @@ button:hover {
         margin: auto;
         margin-bottom: 20px;
     }
+
     .weather-box {
         width: 90%;
+    }
+
+    .weather-icon {
+        margin-top: 3rem;
     }
 }
 @media (min-width: 1000px) {
     .column-3 {
         float: left;
-        width: 33.33%;
+        width: 33.333%;
         padding: 10px;
     }
 
