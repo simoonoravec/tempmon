@@ -1,5 +1,4 @@
 //On load
-let gauges = [];
 $(() => {
   $("#range").val("24");
   $("#splash").fadeIn(500, () => {
@@ -19,16 +18,10 @@ $(() => {
             socket.onmessage = (event) => {
               let live_data = JSON.parse(event.data);
 
-              gauges.temp.setValueAnimated(live_data.temp.toFixed(1));
-              gauges.humidity.setValueAnimated(live_data.humidity.toFixed(0));
-              gauges.pressure.setValueAnimated(live_data.pressure.toFixed(0));
-
-              $("#rtd_temp").html(live_data.temp.toFixed(2));
-              $("#rtd_heatindex").html(
-                heatIndex(live_data.temp, live_data.humidity)
-              );
-              $("#rtd_humidity").html(live_data.humidity.toFixed(0));
-              $("#rtd_pressure").html(live_data.pressure.toFixed(0));
+              $("#rtd_temp").html(round(live_data.temp));
+              $("#rtd_heatindex").html(round(heatIndex(live_data.temp, live_data.humidity)));
+              $("#rtd_humidity").html(Math.round(live_data.humidity));
+              $("#rtd_pressure").html(Math.round(live_data.pressure));
             };
           };
 
@@ -50,58 +43,9 @@ $(() => {
       });
     }, 500);
   });
-
-  gauges.temp = createGauge({
-    element_id: "temp_now",
-    value: {
-      min: 10,
-      max: 40,
-      current: 0,
-      precision: 1,
-      unit: "°C",
-    },
-    colors: {
-      default: "#ef4655",
-      low: { value: 19, color: "#33c5ff" },
-      medium: { value: 24, color: "#ebbd34" },
-      high: { color: "#eb4f34" },
-    },
-  });
-
-  gauges.humidity = createGauge({
-    element_id: "humidity_now",
-    value: {
-      min: 10,
-      max: 100,
-      current: 0,
-      precision: 0,
-      unit: "%",
-    },
-    colors: {
-      default: "#ef4655",
-      low: { value: 40, color: "#347aeb" },
-      medium: { value: 60, color: "#3734eb" },
-      high: { color: "#1c1fd4" },
-    },
-  });
-
-  gauges.pressure = createGauge({
-    element_id: "pressure_now",
-    value: {
-      min: 950,
-      max: 1050,
-      current: 0,
-      precision: 0,
-      unit: "hPa",
-    },
-    colors: {
-      default: "#ef4655",
-      low: { value: 955, color: "#94d41c" },
-      medium: { value: 975, color: "#eb4f34" },
-      high: { color: "#d41c35" },
-    },
-  });
 });
+
+const round = (val) => (Math.round(val * 10) / 10).toFixed(1);
 
 const heatIndex = (temp_c, humidity) => {
   let temp_f = (temp_c * 9) / 5 + 32;
@@ -120,7 +64,7 @@ const heatIndex = (temp_c, humidity) => {
         0.00000199 * temp_f * temp_f * humidity * humidity;
   let hi_c = ((hi_f - 32) * 5) / 9;
 
-  return hi_c.toFixed(2);
+  return round(hi_c);
 };
 
 const errorModal = (msg) => {
@@ -155,41 +99,13 @@ const loadData = (range, callback = null) => {
 
 const updateOutdoorData = () => {
   $.getJSON("/api/data/outdoor", (d) => {
-    $("#owm_temp").html(d.data.temp.toFixed(2));
-    $("#owm_heatindex").html(d.data.heat_index.toFixed(2));
-    $("#owm_humidity").html(d.data.humidity.toFixed(0));
-    $("#owm_pressure").html(d.data.pressure.toFixed(0));
-    $("#owm_cloudiness").html(d.data.cloudiness.toFixed(0));
+    $("#owm_temp").html(round(d.data.temp));
+    $("#owm_heatindex").html(round(d.data.heat_index));
+    $("#owm_humidity").html(Math.round(d.data.humidity));
+    $("#owm_pressure").html(Math.round(d.data.pressure));
+    $("#owm_cloudiness").html(Math.round(d.data.cloudiness));
 
     setTimeout(updateOutdoorData, d.data.next_update * 1000);
-  });
-};
-
-//Simplified gauge function
-const createGauge = (cfg) => {
-  return Gauge(document.getElementById(cfg.element_id), {
-    min: cfg.value.min,
-    max: cfg.value.max,
-    dialStartAngle: 180,
-    dialEndAngle: 0,
-    value: cfg.value.current,
-    viewBox: "0 0 100 57",
-    label: (value) => {
-      return value.toFixed(cfg.value.precision) + cfg.value.unit;
-    },
-    color: (value) => {
-      let val_ceil = Math.ceil(value);
-      if (val_ceil <= cfg.colors.low.value) {
-        return cfg.colors.low.color;
-      }
-      if (val_ceil <= cfg.colors.medium.value) {
-        return cfg.colors.medium.color;
-      }
-      if (val_ceil > cfg.colors.medium.value) {
-        return cfg.colors.high.color;
-      }
-      return cfg.colors.default;
-    },
   });
 };
 
@@ -249,32 +165,5 @@ const createChart = (el_id, name, times, data, color) => {
   });
 };
 
-//Modals
-var modal_chart = -1;
-const showChartModal = (type, title, color) => {
-  if (modal_chart != -1) modal_chart.destroy();
-  if (window.innerWidth < 1000) {
-    return;
-  }
-
-  modal_chart = createChart(
-    "modal_chart",
-    title,
-    data.data.times,
-    data.data[type],
-    color
-  );
-
-  $("#modal_weather").modal({ fadeDuration: 300 });
-};
-
 //Events
 $("#range").change(() => loadData($("#range").val()));
-
-$("#temp").click(() => showChartModal("temp", "Teplota (°C)", "#e33e2b"));
-
-$("#humidity").click(() =>
-  showChartModal("humidity", "Vlhkosť (%)", "#4287f5")
-);
-
-$("#pressure").click(() => showChartModal("pressure", "Tlak (hPa)", "#3ec412"));

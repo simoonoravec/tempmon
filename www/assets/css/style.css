@@ -57,18 +57,32 @@ button:hover {
 }
 
 @media (max-width: 999px) {
-    .column {
+    .column-3, .column-4, .column-5 {
         width: 95% !important;
         margin: auto;
         margin-bottom: 20px;
     }
+    .weather-box {
+        width: 90%;
+    }
 }
 @media (min-width: 1000px) {
-    .column {
+    .column-3 {
         float: left;
         width: 33.33%;
         padding: 10px;
-        height: 300px;
+    }
+
+    .column-4 {
+        float: left;
+        width: 25%;
+        padding: 10px;
+    }
+
+    .column-5 {
+        float: left;
+        width: 20%;
+        padding: 10px;
     }
 
     .row:after {
@@ -120,13 +134,6 @@ button:hover {
     padding: 8px;
 }
 
-.modal-weather {
-    max-width: unset !important;
-    width: 70% !important;
-    padding: 5px !important;
-    background-color: #e3e3e3 !important;
-}
-
 .splash {
     position: absolute;
     left: 50%;
@@ -159,8 +166,64 @@ button:hover {
 	}
 }
 
-.gauge-container {
-    width: 20rem;
-    height: auto;
+.box {
+    background-color: rgba(30, 31, 34, 0.45);
+    border-radius: 10px;
+    width: 80%;
+    margin: auto;
+    padding-bottom: 2rem;
+    border: 2px solid #27272b;
+    border-top: none;
+}
+
+.box-header {
+    text-transform: uppercase;
+    border-radius: 10px 10px 0 0;
+    background-color: #303035;
+    padding: 1rem;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+.weather-box {
+    background-color: #222327;
+    border-radius: 10px;
+    width: 95%;
+    margin: auto;
+    padding-bottom: 2rem;
+}
+
+.weather-box-header {
+    border-radius: 10px 10px 0 0;
+    background-color: #303236;
+    padding: 1rem;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+.weather-icon {
+    filter: invert();
+    height: 7rem;
+    width: auto;
+}
+
+.weather-description {
+    color: #6b6b6b;
+    font-weight: bold;
+    margin: 0;
+}
+
+.weather-value {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.charts-box {
+    width: 90%;
     margin: auto;
 }

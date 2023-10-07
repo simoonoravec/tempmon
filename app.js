@@ -252,7 +252,6 @@ let owm_cache = {
  * @returns Array | null
  */
 async function getOutdoorData() {
-  console.log(owm_cache.expires);
   if (owm_cache.expires > unixTime()) {
     let data = owm_cache.data;
 

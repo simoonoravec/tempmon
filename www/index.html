@@ -26,89 +26,108 @@
 <div id="page" style="display:none;">
     <h1>TEMPMON</h1>
     <div id="container">
-        <div class="row" style="text-align:center;">
-            <div class="column">
-                <h3>Teplota</h3>
-                <div class="gauge-container" id="temp_now"></div>
+        <div class="box">
+            <div class="box-header">
+                Aktuálne počasie
             </div>
-            <div class="column">
-                <h3>Vlhkosť</h3>
-                <div class="gauge-container" id="humidity_now"></div>
+
+            <div class="weather-box">
+                <div class="weather-box-header">
+                    Izba
+                </div>
+                <div class="row" style="text-align:center;">
+                    <div class="column-4">
+                        <img class="weather-icon" src="/assets/svg/temperature.svg">
+                        <p class="weather-description">Teplota</p>
+                        <p class="weather-value"><span id="rtd_temp">0</span> &deg;C</p>
+                    </div>
+                    <div class="column-4">
+                        <img class="weather-icon" src="/assets/svg/temperature_feels_like.svg">
+                        <p class="weather-description">Pocitová teplota</p>
+                        <p class="weather-value"><span id="rtd_heatindex">0</span> &deg;C</p>
+                    </div>
+                    <div class="column-4">
+                        <img class="weather-icon" src="/assets/svg/humidity.svg">
+                        <p class="weather-description">Vlhkosť</p>
+                        <p class="weather-value"><span id="rtd_humidity">0</span> %</p>
+                    </div>
+                    <div class="column-4">
+                        <img class="weather-icon" src="/assets/svg/pressure.svg">
+                        <p class="weather-description">Tlak</p>
+                        <p class="weather-value"><span id="rtd_pressure">0</span> hPa</p>
+                    </div>
+                </div>
             </div>
-            <div class="column">
-                <h3>Tlak</h3>
-                <div class="gauge-container" id="pressure_now"></div>
-            </div>
+    
+            <div class="weather-box" style="margin-top: 3rem;">
+                <div class="weather-box-header">
+                    Vonku
+                </div>
+                <div class="row" style="text-align:center;">
+                    <div class="column-5">
+                        <img class="weather-icon" src="/assets/svg/temperature.svg">
+                        <p class="weather-description">Teplota</p>
+                        <p class="weather-value"><span id="owm_temp">0</span> &deg;C</p>
+                    </div>
+                    <div class="column-5">
+                        <img class="weather-icon" src="/assets/svg/temperature_feels_like.svg">
+                        <p class="weather-description">Pocitová teplota</p>
+                        <p class="weather-value"><span id="owm_heatindex">0</span> &deg;C</p>
+                    </div>
+                    <div class="column-5">
+                        <img class="weather-icon" src="/assets/svg/humidity.svg">
+                        <p class="weather-description">Vlhkosť</p>
+                        <p class="weather-value"><span id="owm_humidity">0</span> %</p>
+                    </div>
+                    <div class="column-5">
+                        <img class="weather-icon" src="/assets/svg/pressure.svg">
+                        <p class="weather-description">Tlak</p>
+                        <p class="weather-value"><span id="owm_pressure">0</span> hPa</p>
+                    </div>
+                    <div class="column-5">
+                        <img class="weather-icon" src="/assets/svg/cloudiness.svg">
+                        <p class="weather-description">Oblačnosť</p>
+                        <p class="weather-value"><span id="owm_cloudiness">0</span> %</p>
+                    </div>
+                </div>
+            </div>         
         </div>
 
-        <div style="text-align:center;margin-bottom:10px;">
-            Rozsah grafov: <select id="range">
-                <option value="48">48 hodín</option>
-                <option value="24" selected="selected">24 hodín</option>
-                <option value="12">12 hodín</option>
-                <option value="8">8 hodín</option>
-                <option value="2">2 hodiny</option>
-                <option value="1">1 hodina</option>
-            </select>
-        </div>
+        <div class="box" style="margin-top: 5rem;">
+            <div class="box-header">
+                Nedávna história počasia v izbe
+            </div>
 
-        <div class="row">
-            <div class="column">
-                <canvas id="temp"></canvas>
+            <div style="text-align:center;margin-bottom:10px;">
+                Rozsah grafov: <select id="range">
+                    <option value="48">48 hodín</option>
+                    <option value="24" selected="selected">24 hodín</option>
+                    <option value="12">12 hodín</option>
+                    <option value="8">8 hodín</option>
+                    <option value="2">2 hodiny</option>
+                    <option value="1">1 hodina</option>
+                </select>
             </div>
-            <div class="column">
-                <canvas id="humidity"></canvas>
+    
+            <div class="row">
+                <div class="column-3">
+                    <canvas id="temp"></canvas>
+                </div>
+                <div class="column-3">
+                    <canvas id="humidity"></canvas>
+                </div>
+                <div class="column-3">
+                    <canvas id="pressure"></canvas>
+                </div>
             </div>
-            <div class="column">
-                <canvas id="pressure"></canvas>
-            </div>
-        </div>
-
-        <div style="text-align:center;margin-top:2rem;">
-            <h3>Aktuálne dáta</h3>
-            <table align="center" class="t1">
-                <tr>
-                    <td></td>
-                    <td>Izba</td>
-                    <td><span style="border-bottom: 1px dashed #999;" class="tooltip-right" data-tooltip="Dáta získané cez OpenWeatherMap, aktualizácia raz za 10 minút">Vonku</span></td>
-                </tr>
-                <tr>
-                    <th class="ta-right">Teplota</th>
-                    <td class="ta-center"><span id="rtd_temp">0</span> &deg;C</td>
-                    <td class="ta-center"><span id="owm_temp">0</span> &deg;C</td>
-                </tr>
-                <tr>
-                    <th class="ta-right">Pocitová teplota</th>
-                    <td class="ta-center"><span id="rtd_heatindex">0</span> &deg;C</td>
-                    <td class="ta-center"><span id="owm_heatindex">0</span> &deg;C</td>
-                </tr>
-                <tr>
-                    <th class="ta-right">Vlhkosť</th>
-                    <td class="ta-center"><span id="rtd_humidity">0</span> %</td>
-                    <td class="ta-center"><span id="owm_humidity">0</span> %</td>
-                </tr>
-                <tr>
-                    <th class="ta-right">Tlak</th>
-                    <td class="ta-center"><span id="rtd_pressure">0</span> hPa</td>
-                    <td class="ta-center"><span id="owm_pressure">0</span> hPa</td>
-                </tr>
-                <tr>
-                    <th class="ta-right">Oblačnosť</th>
-                    <td class="ta-center">N/A</td>
-                    <td class="ta-center"><span id="owm_cloudiness">0</span> %</td>
-                </tr>
-            </table>
-            <br>
         </div>
     </div>
 
-    <div id="modal_weather" class="modal modal-weather"><canvas id="modal_chart"></canvas></div>
     <div id="modal_error" class="modal ta-center"><span style="color:#000;" id="modal_error_text"></span><br><button style="margin-top:1rem;" onclick="location.reload();">Obnoviť stránku</button></div>
 <div>
 <script src="/assets/js/jquery.min.js"></script>
 <script src="/assets/js/chart.min.js"></script>
 <script src="/assets/js/jquery.modal.min.js"></script>
-<script src="/assets/js/gauge.min.js"></script>
 <script src="/assets/js/main.js"></script>
 </body>
 </html>
