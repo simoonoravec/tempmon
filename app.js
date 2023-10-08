@@ -262,7 +262,7 @@ async function getOutdoorData() {
   }
 
   try {
-    let data = await fetch(`https://api.openweathermap.org/data/2.5/weather?appid=${config.owm_api_key}&lat=${config.own_location.lat}&lon=${config.own_location.lon}&units=metric`);
+    let data = await fetch(`https://api.openweathermap.org/data/2.5/weather?appid=${config.owm_api_key}&lat=${config.own_location.lat}&lon=${config.own_location.lon}&units=metric&lang=sk`);
     data = await data.json();
 
     if (data.cod != 200) {
@@ -276,13 +276,17 @@ async function getOutdoorData() {
       humidity: data.main.humidity,
       pressure: data.main.pressure,
       cloudiness: data.clouds.all,
-      wind: data.wind.speed
+      wind: data.wind.speed,
+      weather: {
+        description: data.weather[0].description.charAt(0).toUpperCase() + data.weather[0].description.slice(1),
+        icon: data.weather[0].icon
+      }
     };
 
-    owm_cache.expires = unixTime()+300;
+    owm_cache.expires = unixTime()+600;
     owm_cache.data = out;
 
-    out.next_update = 300;
+    out.next_update = 600;
     out.cached = false;
 
     return out;

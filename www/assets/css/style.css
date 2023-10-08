@@ -64,11 +64,15 @@ button:hover {
     }
 
     .weather-box {
-        width: 90%;
+        width: 90% !important;
     }
 
     .weather-icon {
         margin-top: 3rem;
+    }
+
+    .box {
+        width: 95% !important;
     }
 }
 @media (min-width: 1000px) {

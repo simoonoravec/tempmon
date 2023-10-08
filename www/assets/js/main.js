@@ -103,7 +103,8 @@ const updateOutdoorData = () => {
     $("#owm_heatindex").html(round(d.data.heat_index));
     $("#owm_humidity").html(Math.round(d.data.humidity));
     $("#owm_pressure").html(Math.round(d.data.pressure));
-    $("#owm_cloudiness").html(Math.round(d.data.cloudiness));
+    $("#owm_weather_icon").attr("src", `/assets/owm_icons/${d.data.weather.icon}.png`);
+    $("#owm_weather_desc").html(d.data.weather.description);
 
     setTimeout(updateOutdoorData, d.data.next_update * 1000);
   });
