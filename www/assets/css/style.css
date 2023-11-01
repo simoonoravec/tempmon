@@ -4,13 +4,7 @@
 }
 
 html {
-    overflow: scroll;
     overflow-x: hidden;
-}
-
-::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
 }
 
 body {
@@ -152,8 +146,8 @@ button:hover {
 }
 
 #splash-logo {
-    width: 20rem;
-    height: 20rem;
+    width: 15rem;
+    height: 15rem;
 }
 
 .pulse {

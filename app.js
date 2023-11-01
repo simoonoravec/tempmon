@@ -161,6 +161,12 @@ function initHttp() {
     });
   });
 
+  server.all('/assets/*', (req, res) => {
+    res.status(404);
+    res.set('Content-Type', 'text/plain');
+    res.send("404 Not Found");
+  });
+
   server.all('*', (req, res) => {
     res.redirect('/');
   });
